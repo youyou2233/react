@@ -4,7 +4,6 @@ import FilterButton from "./components/FilterButton";
 import { useState } from "react";
 import { nanoid } from "nanoid";
 
-
 export default function App(props) {
 //const taskList = props.tasks?.map((task) => task.name);
 //上面一行的解读：相当与以下的函数的功能
@@ -39,6 +38,19 @@ function deleteTask(id) {
   setTasks(remainingTasks);
 }
 
+function editTask(id, newName) {
+  const editedTaskList = tasks.map((task) => {
+    // if this task has the same ID as the edited task
+    if (id === task.id) {
+      // Copy the task and update its name
+      return { ...task, name: newName };
+    }
+    // Return the original task if it's not the edited task
+    return task;
+  });
+  setTasks(editedTaskList);
+}
+
 const taskList = tasks.map((task) => (
   <Todo
     id={task.id}
@@ -47,6 +59,7 @@ const taskList = tasks.map((task) => (
     key={task.id}//规定无序列表要有key
     toggleTaskCompleted={toggleTaskCompleted}
     deleteTask={deleteTask}
+    editTask={editTask}
   />
 ));
 

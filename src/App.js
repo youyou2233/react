@@ -13,8 +13,28 @@ export default function App(props) {
 // for (let i=0;i<props.tasks.lengh;i++) {
 //   array.add(mapTaskToName(props.tasks[i]));
 // }
+
 const [tasks, setTasks] = useState(props.tasks);
 //注意：useState左边数组的两个元素的名字是自定义的，但是无论元素名字怎样，功能是不变的
+const [filter, setFilter] = useState("All");
+
+const FILTER_MAP = {
+  All: () => true,
+  Active: (task) => !task.completed,
+  Completed: (task) => task.completed,
+};
+
+const FILTER_NAMES = Object.keys(FILTER_MAP);
+//Object.keys()是一个JavaScript内置方法，来获取对象的所有可枚举属性的键名，并返回一个数组
+
+const filterList = FILTER_NAMES.map((name) => (
+  <FilterButton 
+     key={name} 
+     name={name}
+     isPressed={name === filter}
+     setFilter={setFilter}/>
+));//此时的键名(all、active、completed)一被引用就会开始调用键值(即过滤函数)
+
 function addTask(name) {
   const newTask = { id: `todo-${nanoid()}`, name, completed: false };
   setTasks([...tasks, newTask]);//省略号代表的是复制现有的任务列表，确保不修改原数组
@@ -51,8 +71,8 @@ function editTask(id, newName) {
   setTasks(editedTaskList);
 }
 
-const taskList = tasks.map((task) => (
-  <Todo
+const taskList = tasks.filter(FILTER_MAP[filter]).map((task)=>
+  (<Todo
     id={task.id}
     name={task.name}
     completed={task.completed}
@@ -74,9 +94,7 @@ const headingText = `${taskList.length} ${tasksNoun} remaining`;
       <h1>TodoMatic</h1>
       <Form onSubmit={addTask} />
       <div className="filters btn-group stack-exception">
-      <FilterButton filterName="All"/>
-      <FilterButton filterName="Active"/>
-      <FilterButton filterName="Completed"/>
+      {filterList};
       </div>
       <h2 id="list-heading"> {headingText} </h2>
       <ul
